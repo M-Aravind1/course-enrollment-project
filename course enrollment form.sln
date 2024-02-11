@@ -1,25 +1,121 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.7.34031.279
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "course enrollment form", "course enrollment form\course enrollment form.csproj", "{38674DF4-CA9E-45C1-BE50-32FB374A223D}"
-EndProject
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{38674DF4-CA9E-45C1-BE50-32FB374A223D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{38674DF4-CA9E-45C1-BE50-32FB374A223D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{38674DF4-CA9E-45C1-BE50-32FB374A223D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{38674DF4-CA9E-45C1-BE50-32FB374A223D}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {3E7B1FDF-104F-4964-BDC5-659B2BE89A3A}
-	EndGlobalSection
-EndGlobal
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Data.SqlClient;
+
+namespace course_enrollment_form
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+            SqlCommand a = new SqlCommand("select * from student", c);
+            SqlDataAdapter da = new SqlDataAdapter(a);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            dataGridView1.DataSource = dt;
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+           
+
+        }
+
+        SqlConnection c = new SqlConnection(@"data source=LAPTOP-1FKDLJQT\SQLEXPRESS;initial catalog=ce;integrated security = true");
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            SqlCommand a = new SqlCommand("enroll", c);
+            
+            a.CommandType= CommandType.StoredProcedure;
+            a.Parameters.AddWithValue("@Student_name", textBox1.Text);
+            a.Parameters.AddWithValue("@Course", textBox2.Text);
+            a.Parameters.AddWithValue("@Fees", textBox3.Text);
+
+            SqlDataAdapter da = new SqlDataAdapter(a);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            dataGridView1.DataSource = dt;
+
+            textBox1.Clear();
+            textBox2.Clear();
+            textBox3.Clear();
+            textBox4.Clear();
+
+            
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            textBox1.Clear();
+            textBox2.Clear();
+            textBox3.Clear();
+            textBox4.Clear();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            
+            SqlCommand a = new SqlCommand("select * from student", c);
+            SqlDataAdapter da = new SqlDataAdapter(a);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            dataGridView1.DataSource = dt;
+            
+            
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            c.Open();
+            SqlCommand a = new SqlCommand("delete from student where S_ID ="+textBox4.Text+"", c);
+            int i = a.ExecuteNonQuery();
+            if (i > 0) { MessageBox.Show("done"); }
+            else { MessageBox.Show("error"); }
+            c.Close();
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            c.Open();
+            SqlCommand a = new SqlCommand("select * from student where S_ID="+textBox4.Text+"",c);
+            SqlDataReader r = a.ExecuteReader();
+            if (r.Read()) 
+            {
+                textBox1.Text = r["Student_name"].ToString();
+                textBox2.Text = r["Course"].ToString();
+                textBox3.Text = r["Fees"].ToString();
+
+                r.Close();
+
+            }
+            
+           
+           
+            c.Close();
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            SqlCommand b = new SqlCommand("update student set Student_name = '" + textBox1.Text + "', Course = '" + textBox2.Text + "' ,Fees = " + textBox3.Text + " where S_ID=" + textBox4.Text + "", c);
+            c.Open();
+            int i = b.ExecuteNonQuery();
+            if (i > 0) { MessageBox.Show("updated"); }
+            else { MessageBox.Show("error"); }
+            c.Close();
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+    }
+}
